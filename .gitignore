@@ -1,0 +1,26 @@
+# Python-related files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+*.log
+
+# Virtual environment (venv) - Don't commit dependencies
+venv/
+env/
+*.venv
+
+# Ignore database files
+*.sqlite3
+db.sqlite3
+
+# IDE & Editor files (PyCharm, VSCode, JetBrains, etc.)
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build and distribution folders
+dist/
+build/
