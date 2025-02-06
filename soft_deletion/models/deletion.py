@@ -1,7 +1,8 @@
 from collections import Counter
-from operator import attrgetter
+from functools import reduce
+from operator import attrgetter, or_
 
-from django.db import transaction
+from django.db import transaction, models
 from django.db.models import sql
 from django.db.models.deletion import Collector
 from django.utils.timezone import now
@@ -47,11 +48,25 @@ class SoftDeleteCollector(Collector):
                     soft_deleted_counter[qs.model._meta.label] += count
 
             # update fields
-            for model, instances_for_fieldvalues in self.field_updates.items():
-                for (field, value), instances in instances_for_fieldvalues.items():
+            for (field, value), instances_list in self.field_updates.items():
+                updates = []
+                objs = []
+                for instances in instances_list:
+                    if (
+                        isinstance(instances, models.QuerySet)
+                        and instances._result_cache is None
+                    ):
+                        updates.append(instances)
+                    else:
+                        objs.extend(instances)
+                if updates:
+                    combined_updates = reduce(or_, updates)
+                    combined_updates.update(**{field.name: value})
+                if objs:
+                    model = objs[0].__class__
                     query = sql.UpdateQuery(model)
                     query.update_batch(
-                        [obj.pk for obj in instances], {field.name: value}, self.using
+                        list({obj.pk for obj in objs}), {field.name: value}, self.using
                     )
 
             # reverse instance collections
@@ -72,11 +87,6 @@ class SoftDeleteCollector(Collector):
                             sender=model, instance=obj, using=self.using
                         )
 
-        # update collected instances
-        for instances_for_fieldvalues in self.field_updates.values():
-            for (field, value), instances in instances_for_fieldvalues.items():
-                for obj in instances:
-                    setattr(obj, field.attname, value)
         return sum(soft_deleted_counter.values()), dict(soft_deleted_counter)
 
     def _has_signal_listeners(self, model):
