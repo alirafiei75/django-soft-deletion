@@ -4,7 +4,7 @@ setup(
     name="django-soft-deletion",
     version="0.1.0",
     packages=find_packages(),
-    install_requires=["Django>=3.2"],
+    install_requires=["Django==4.2"],
     license="MIT",
     description="A Django-based library for implementing soft deletion using a deleted_at timestamp.",
     author="Ali Rafiei",
