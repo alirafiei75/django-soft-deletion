@@ -14,7 +14,7 @@
 ## 📦 Installation
 
 ```bash
-pip install git+https://github.com/YOUR_USERNAME/django-soft-deletion.git
+pip install git+https://github.com/alirafiei75/django-soft-deletion.git
 ```
 
 ---
