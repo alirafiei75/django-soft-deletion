@@ -16,4 +16,6 @@ setup(
         "Programming Language :: Python :: 3",
         "Development Status :: 4 - Beta",
     ],
+    include_package_data=True,
+    package_data={"": ["LICENSE"]},
 )
